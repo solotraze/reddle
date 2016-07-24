@@ -1,0 +1,27 @@
+{
+  "name": "reddle",
+  "version": "0.1.1",
+  "description": "Redis monitor fromm web on hosted on node.",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solotraze/reddle.git"
+  },
+  "keywords": [
+    "redis",
+    "monitor"
+  ],
+  "author": "Solo Traze",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/solotraze/reddle/issues"
+  },
+  "homepage": "https://github.com/solotraze/reddle#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0"
+  }
+}
