@@ -1,10 +1,12 @@
 var redis = require('redis');
-var redisIp = '192.168.1.4';//127.0.0.1
-var redisClient = redis.createClient({host:redisIp});
+var redisClient;
 
-redisClient.on('error', function(err) {
-  console.log('Error: ' + err);
-});
+function connect(connectionDetails) {
+  redisClient = redis.createClient({host:connectionDetails.host, port:connectionDetails.port});
+  redisClient.on('error', function(err) {
+    console.log('Error: ' + err);
+  });
+}
 
 function addObjectToCache(key, obj, callback) {
   redisClient.set(key, obj, function (err, response) {
@@ -20,5 +22,6 @@ function getObjectFromCache(key, callback) {
   });
 }
 
+exports.connect = connect;
 exports.addObjectToCache = addObjectToCache; 
 exports.getObjectFromCache = getObjectFromCache;
