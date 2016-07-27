@@ -18,5 +18,18 @@ describe('reddle.js', function(){
       done(); // Mark test complete
     });
   });
+  describe('subscribe', function(){
+    it('should be able to get the server info for a key by subscribing', function(done){
+      this.timeout(webTestTimeout);
+
+      reddle.connect({host:constants.REDIS_HOST, port:constants.REDIS_PORT});
+      reddle.subscribe('used_memory', function (attribute, val) {
+        console.log('Redis INFO: '+attribute+' = '+val);
+        reddle.stopCollection();
+        done(); // Mark test complete
+      });
+      reddle.startCollection();
+    });
+  });
 });
 
