@@ -37,7 +37,9 @@ function serveInfoToSubscribers () {
       if (handlers) {
         for(var i = 0; i < handlers.length; i++) {
           var handler = handlers[i];
-          handler(key, serverInfo[key]);
+          handler({ attribute: key,
+                    value: serverInfo[key],
+                    timestamp: (new Date())});
         }
       }
     }

@@ -25,8 +25,16 @@ describe('reddle.js', function(){
 
       reddle.connect({host:constants.REDIS_HOST, port:constants.REDIS_PORT});
       reddle.setRefreshTime(1000);
-      reddle.subscribe('used_memory', function (attribute, val) {
-        console.log('Redis INFO: '+attribute+' = '+val);
+      reddle.subscribe('used_memory', function (data) {
+        assert.isNotNull(data);
+        assert.isNotNull(data.attribute);
+        assert.isNotNull(data.value);
+        assert.isNotNaN(parseInt(data.value));
+        assert.isNotNull(data.timestamp);
+
+        console.log('INFO: ' +
+                    data.attribute+' = ' + data.value +
+                    ' -- at ' + data.timestamp);
         
         callCounter++;
         // make sure repeated info is passed to us as subscription listener
