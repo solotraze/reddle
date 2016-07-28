@@ -19,14 +19,22 @@ describe('reddle.js', function(){
     });
   });
   describe('subscribe', function(){
-    it('should be able to get the server info for a key by subscribing', function(done){
+    it('should get periodic counters from the server by subscribing', function(done){
       this.timeout(webTestTimeout);
+      var callCounter = 0;
 
       reddle.connect({host:constants.REDIS_HOST, port:constants.REDIS_PORT});
+      reddle.setRefreshTime(1000);
       reddle.subscribe('used_memory', function (attribute, val) {
         console.log('Redis INFO: '+attribute+' = '+val);
-        reddle.stopCollection();
-        done(); // Mark test complete
+        
+        callCounter++;
+        // make sure repeated info is passed to us as subscription listener
+        if (callCounter >= 3)
+        { 
+          reddle.stopCollection();
+          done(); // Mark test complete
+        }
       });
       reddle.startCollection();
     });

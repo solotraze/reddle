@@ -14,7 +14,7 @@ function connect (connectionDetails) {
 
 function startCollection() {
   stopCollection();
-  bgTask = setInterval(serveInfoToSubscriber, refreshTime);
+  bgTask = setInterval(serveInfoToSubscribers, refreshTime);
 }
 
 function stopCollection() {
@@ -33,9 +33,12 @@ function serveInfoToSubscribers () {
   var serverInfo = getServerInfo();
   for (var key in serverInfo) {
     if (serverInfo.hasOwnProperty(key)) {
-      var callback = subscriptions[key];
-      if (callback) {
-        callback(key, serverInfo[key]);
+      var handlers = subscriptions[key];
+      if (handlers) {
+        for(var i = 0; i < handlers.length; i++) {
+          var handler = handlers[i];
+          handler(key, serverInfo[key]);
+        }
       }
     }
   } 
@@ -49,19 +52,10 @@ function subscribe(attribute, handler) {
   var existingList = subscriptions[attribute];
   if (!existingList) existingList = [];
   existingList.push(handler);
-  subscription[attribute] = existingList;
+  subscriptions[attribute] = existingList;
 
-  console.log('Total subscription for ' + attribute + ' incresed to: '+existingList.length);
+  console.log('Listener added for ' + attribute + '. Total: '+existingList.length);
 }
-
-/*
-function getObjectFromCache(key, callback) {
-  redisClient.get(key, function (err, response) {
-    if (err) callback(err);
-    callback(null, response);
-  });
-}
-*/
 
 exports.connect = connect;
 exports.setRefreshTime = setRefreshTime;
