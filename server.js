@@ -1,9 +1,14 @@
 #!/bin/env node
 //  OpenShift Node application
 var express = require('express');
-var fs      = require('fs');
+var expressApp = express();
+var server = require('http').Server(expressApp);
+var io = require('socket.io', { transports: ['websocket']})(server);
+var fs = require('fs');
 var bodyParser = require('body-parser'); // To parse POST parameters
+
 var routes = require('./routes');
+var redisHelper = require('./modules/redisHelper');
 
 /**
  *  Define the application.
@@ -94,7 +99,8 @@ var webApp = function() {
      *  the handlers.
      */
     self.initializeServer = function() {
-      self.app = express();
+      self.app = expressApp;
+      self.appServer = server;
 
       self.app.use(bodyParser.json()); // request will need header "Content-Type: application/json"
       self.app.use(bodyParser.urlencoded({ extended: true }));
@@ -121,7 +127,7 @@ var webApp = function() {
      */
     self.start = function() {
         //  Start the app on the specific interface (and port).
-        self.app.listen(self.port, self.ipaddress, function() {
+        self.appServer.listen(self.port, self.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.ipaddress, self.port);
         });
