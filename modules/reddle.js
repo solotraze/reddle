@@ -4,7 +4,6 @@ var redis = require('redis');
 var redisClient;
 var redisEvents = new EventEmitter();
 
-var subscriptions = {};
 var refreshTime = 5000; // in milliseconds
 var bgTask;
  

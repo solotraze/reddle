@@ -3,12 +3,12 @@
 var express = require('express');
 var expressApp = express();
 var server = require('http').Server(expressApp);
-var io = require('socket.io', { transports: ['websocket']})(server);
+var socketio = require('socket.io', { transports: ['websocket']})(server);
 var fs = require('fs');
 var bodyParser = require('body-parser'); // To parse POST parameters
 
 var routes = require('./routes');
-var redisHelper = require('./modules/redisHelper');
+var redidleSockets = require('./modules/reddleSockets');
 
 /**
  *  Define the application.
@@ -101,11 +101,13 @@ var webApp = function() {
     self.initializeServer = function() {
       self.app = expressApp;
       self.appServer = server;
+      self.io = socketio;
 
       self.app.use(bodyParser.json()); // request will need header "Content-Type: application/json"
       self.app.use(bodyParser.urlencoded({ extended: true }));
 
       self.createRoutes();
+      reddleSockets.bindSocket(self.io);
     };
 
 
@@ -128,6 +130,8 @@ var webApp = function() {
     self.start = function() {
         //  Start the app on the specific interface (and port).
         self.appServer.listen(self.port, self.ipaddress, function() {
+
+            reddleSockets.start();
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.ipaddress, self.port);
         });
