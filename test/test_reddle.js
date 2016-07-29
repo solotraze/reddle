@@ -5,7 +5,6 @@ var constants = require('../constants');
 /* Configure test env */
 var webTestTimeout = 10000; // Seconds for test timeout if a web request is involved
 /* Test Data */
-
 describe('reddle.js', function(){
   describe('getServerInfo', function(){
     it('should be able to get the server info', function(done){
@@ -18,6 +17,7 @@ describe('reddle.js', function(){
       done(); // Mark test complete
     });
   });
+
   describe('subscribe', function(){
     it('should get periodic counters from the server by subscribing', function(done){
       this.timeout(webTestTimeout);

@@ -1,9 +1,8 @@
-const EventEmitter = require('events');
+var EventEmitter = require('events').EventEmitter;
 var redis = require('redis');
 
 var redisClient;
-class RedisEvents extends EventEmitter {}
-const redisEvents = new RedisEvents();
+var redisEvents = new EventEmitter();
 
 var subscriptions = {};
 var refreshTime = 5000; // in milliseconds
@@ -41,17 +40,6 @@ function serveInfoToSubscribers () {
                     value: serverInfo[key],
                     timestamp: (new Date())}
                     );
-/*
-      var handlers = subscriptions[key];
-      if (handlers) {
-        for(var i = 0; i < handlers.length; i++) {
-          var handler = handlers[i];
-          handler({ attribute: key,
-                    value: serverInfo[key],
-                    timestamp: (new Date())});
-        }
-      }
-*/
     }
   } 
 }
@@ -62,13 +50,11 @@ function getServerInfo() {
 
 function subscribe(attribute, handler) {
   redisEvents.on(attribute, handler);
-/*
-  var existingList = subscriptions[attribute];
-  if (!existingList) existingList = [];
-  existingList.push(handler);
-  subscriptions[attribute] = existingList;
-*/
   console.log('Listener added for ' + attribute + '. Total: '+redisEvents.listeners(attribute).length);
+}
+
+function removeAllSubscriptions() {
+  redisEvents.removeAllListeners();
 }
 
 exports.connect = connect;
@@ -77,3 +63,4 @@ exports.subscribe = subscribe;
 exports.startCollection = startCollection;
 exports.stopCollection = stopCollection;
 exports.getServerInfo = getServerInfo; 
+exports.removeAllSubscriptions = removeAllSubscriptions;
