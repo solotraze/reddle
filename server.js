@@ -8,7 +8,7 @@ var fs = require('fs');
 var bodyParser = require('body-parser'); // To parse POST parameters
 
 var routes = require('./routes');
-var redidleSockets = require('./modules/reddleSockets');
+var reddleSockets = require('./modules/reddleSockets');
 
 /**
  *  Define the application.

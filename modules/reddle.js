@@ -8,14 +8,13 @@ var refreshTime = 5000; // in milliseconds
 var bgTask;
  
 function connect (connectionDetails) {
-  redisClient = redis.createClient({host:connectionDetails.host, port:connectionDetails.port});
+  redisClient = redis.createClient(connectionDetails);
   redisClient.on('error', function(err) {
     console.log('Error: ' + err);
   });
 }
 
 function startCollection() {
-  stopCollection();
   bgTask = setInterval(serveInfoToSubscribers, refreshTime);
 }
 
@@ -28,6 +27,7 @@ function stopCollection() {
 
 function setRefreshTime(ms) {
   refreshTime = ms;
+  stopCollection();
   startCollection();
 }
 
