@@ -2,6 +2,7 @@
 var reddleHelper = function (socket) {
   var self = this;
   this.socket = socket;
+  this.callbacks = {}; // TODO: make it event based
   
   socket.on('reddle_register_attribute', function(data) {
     self.onAttributeRegistered(data);
@@ -13,18 +14,28 @@ var reddleHelper = function (socket) {
   });
 }
 
-reddleHelper.prototype.subscribeAttribute = function(attribute) {
+reddleHelper.prototype.subscribeAttribute = function(attribute, callback) {
   if (socket) {
     socket.emit('reddle_register_attribute', attribute);
+    this.callbacks[attribute] = callback;
   }
 };
 
 reddleHelper.prototype.onAttributeReceived = function(data) {
-  console.log(data.attribute+' = '+data.value+' ('+data.timestamp +')');
+  //console.log(data.attribute+' = '+data.value+' ('+data.timestamp +')');
+  var callback = this.callbacks[data.attribute];
+  if (callback) {
+    callback(data);
+  }
 };
 
-reddleHelper.prototype.onAttributeRegistered = function(msg) {
-  console.log('attribute registered');
+reddleHelper.prototype.onAttributeRegistered = function(data) {
+  if (data.success) {
+    console.log('Attribute successfully registered: '+ data.attribute);
+  }
+  else {
+	console.log('Attribute could not be registered: '+ data.attribute);
+  }
 };
 
 reddleHelper.prototype.setRefreshTime = function(ms) {
@@ -37,4 +48,5 @@ reddleHelper.prototype.clearClients = function() {
   if (socket) {
     socket.emit('reddle_clear_clients', '');
   }
+  callbacks = {};
 };

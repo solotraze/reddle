@@ -7,8 +7,10 @@ function prepareUIElements() {
 
 function onBtnActionClicked() {
   var redisAttr = 'used_memory';
-  reddleHelperObj.subscribeAttribute(redisAttr);
-  $('#dvContent').text('Subscribed for '+redisAttr);
+  reddleHelperObj.subscribeAttribute(redisAttr, function (data){
+	$('#dvContent').html(data.attribute+' = '+data.value+' ('+data.timestamp+')');
+  });
+  
 }
 
 $(document).ready(function(){
