@@ -1,5 +1,6 @@
 var EventEmitter = require('events').EventEmitter;
 var redis = require('redis');
+var redisParser = require('redis-info');
 
 var redisClient;
 var redisEvents = new EventEmitter();
@@ -32,19 +33,30 @@ function setRefreshTime(ms) {
 }
 
 function serveInfoToSubscribers () {
-  var serverInfo = getServerInfo();
-  for (var key in serverInfo) {
-    if (serverInfo.hasOwnProperty(key)) {
-      redisEvents.emit(key, { attribute: key,
-                    value: serverInfo[key],
-                    timestamp: (new Date())}
-                    );
-    }
-  } 
+  getServerInfo(function(err, serverInfo) {
+	if (err) return;
+		
+    for (var key in serverInfo) {
+      if (serverInfo.hasOwnProperty(key)) {
+        redisEvents.emit(key, { attribute: key,
+                      value: serverInfo[key],
+                      timestamp: (new Date())}
+                      );
+      }
+    } 
+  });
 }
 
-function getServerInfo() {
-  return redisClient.server_info;
+function getServerInfo(callback) {
+  redisClient.info(function(err, data) {
+	if (err){
+	  callback(err);
+    }
+    else {
+	  var info = parseInfo(data);
+	  callback(null, info);
+	}
+  });
 }
 
 function subscribe(attribute, handler) {
@@ -54,6 +66,13 @@ function subscribe(attribute, handler) {
 
 function removeAllSubscriptions() {
   redisEvents.removeAllListeners();
+}
+
+function parseInfo(data) {
+  var info = redisParser.parse(data);
+  //console.log(JSON.stringify(info, null, 4));
+  
+  return info;
 }
 
 exports.connect = connect;
