@@ -70,6 +70,12 @@ function subscribe(attribute, handler) {
   console.log('Listener added for ' + attribute + '. Total: '+redisEvents.listeners(attribute).length);
 }
 
+
+function unsubscribe(attribute, handler) {
+  redisEvents.removeListener(attribute, handler);
+  console.log('Listener reduced for ' + attribute + '. Total: '+redisEvents.listeners(attribute).length);
+}
+
 function removeAllSubscriptions() {
   redisEvents.removeAllListeners();
 }
@@ -84,6 +90,7 @@ function parseInfo(data) {
 exports.connect = connect;
 exports.setRefreshTime = setRefreshTime;
 exports.subscribe = subscribe;
+exports.unsubscribe = unsubscribe;
 exports.startCollection = startCollection;
 exports.stopCollection = stopCollection;
 exports.getServerInfo = getServerInfo;

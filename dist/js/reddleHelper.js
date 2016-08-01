@@ -3,14 +3,14 @@ var reddleHelper = function (socket) {
   var self = this;
   this.socket = socket;
   this.callbacks = {}; // TODO: make it event based
-  
+
   socket.on('reddle_register_attribute', function(data) {
     self.onAttributeRegistered(data);
   });
   // Following will be done from react ready event in index_react.js
-  
+
   socket.on('reddle_attribute', function(data) {
-    self.onAttributeReceived(data); 
+    self.onAttributeReceived(data);
   });
 }
 
@@ -18,6 +18,13 @@ reddleHelper.prototype.subscribeAttribute = function(attribute, callback) {
   if (socket) {
     socket.emit('reddle_register_attribute', attribute);
     this.callbacks[attribute] = callback;
+  }
+};
+
+reddleHelper.prototype.unsubscribeAttribute = function(attribute) {
+  if (socket) {
+    socket.emit('reddle_deregister_attribute', attribute);
+    this.callbacks[attribute] = null;
   }
 };
 
