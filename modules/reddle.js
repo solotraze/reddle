@@ -7,7 +7,7 @@ var redisEvents = new EventEmitter();
 
 var refreshTime = 5000; // in milliseconds
 var bgTask;
- 
+
 function connect (connectionDetails) {
   redisClient = redis.createClient(connectionDetails);
   redisClient.on('error', function(err) {
@@ -16,26 +16,32 @@ function connect (connectionDetails) {
 }
 
 function startCollection() {
+  if(bgTask) {
+    clearInterval(bgTask);
+  }
   bgTask = setInterval(serveInfoToSubscribers, refreshTime);
 }
 
+// Stop periodic task. Return True if the task active
 function stopCollection() {
   if(bgTask) {
     clearInterval(bgTask);
     bgTask = null;
+    return true;
   }
+  else { return false; }
 }
 
 function setRefreshTime(ms) {
   refreshTime = ms;
-  stopCollection();
-  startCollection();
+  if(stopCollection()) {
+    startCollection();
+  }
 }
 
 function serveInfoToSubscribers () {
   getServerInfo(function(err, serverInfo) {
 	if (err) return;
-		
     for (var key in serverInfo) {
       if (serverInfo.hasOwnProperty(key)) {
         redisEvents.emit(key, { attribute: key,
@@ -43,19 +49,19 @@ function serveInfoToSubscribers () {
                       timestamp: (new Date())}
                       );
       }
-    } 
+    }
   });
 }
 
 function getServerInfo(callback) {
   redisClient.info(function(err, data) {
-	if (err){
-	  callback(err);
+	  if (err){
+	    callback(err);
     }
     else {
-	  var info = parseInfo(data);
-	  callback(null, info);
-	}
+	    var info = parseInfo(data);
+	    callback(null, info);
+	  }
   });
 }
 
@@ -71,7 +77,7 @@ function removeAllSubscriptions() {
 function parseInfo(data) {
   var info = redisParser.parse(data);
   //console.log(JSON.stringify(info, null, 4));
-  
+
   return info;
 }
 
@@ -80,5 +86,5 @@ exports.setRefreshTime = setRefreshTime;
 exports.subscribe = subscribe;
 exports.startCollection = startCollection;
 exports.stopCollection = stopCollection;
-exports.getServerInfo = getServerInfo; 
+exports.getServerInfo = getServerInfo;
 exports.removeAllSubscriptions = removeAllSubscriptions;

@@ -9,29 +9,29 @@ reddle.connect({host:constants.REDIS_HOST, port:constants.REDIS_PORT});
 redisHelper.connect({host:constants.REDIS_HOST, port:constants.REDIS_PORT});
 
 /* Test Data */
-    
+
 describe('reddle.js', function(){
   describe('getServerInfo', function(){
 	this.timeout(webTestTimeout);
-	  
+
     it('should be able to get the server info', function(done){
       reddle.getServerInfo(function (err, serverInfo) {
 		assert.isNull(err);
         assert.isNotNull(serverInfo);
-        //console.log(JSON.stringify(serverInfo)); 
+        //console.log(JSON.stringify(serverInfo));
         done(); // Mark test complete
       });
     });
-    
+
     it('should be able to get the latest server info', function(done){
       reddle.getServerInfo(function (err, serverInfo) {
         assert.isNotNull(serverInfo);
-        var keys = serverInfo.databases[0].keys; 
-      
+        var keys = serverInfo.databases[0].keys;
+
         redisHelper.addObjectToCache('alpha'+(new Date()), 'abc', function() {
 		  reddle.getServerInfo(function (err, serverInfo2) {
             assert.isNotNull(serverInfo2);
-            var keys2 = serverInfo2.databases[0].keys; 
+            var keys2 = serverInfo2.databases[0].keys;
             assert.isTrue(keys < keys2);
             done(); // Mark test complete
 	      });
@@ -42,14 +42,13 @@ describe('reddle.js', function(){
 
   describe('subscribe', function(){
 	this.timeout(webTestTimeout);
-	  
+
     it('should get periodic counters from the server by subscribing', function(done){
       var callCounter = 0;
 
       reddle.setRefreshTime(1000);
-      // No need
-      //reddle.startCollection();
-      
+      reddle.startCollection();
+
       reddle.subscribe('used_memory', function (data) {
         assert.isNotNull(data);
         assert.isNotNull(data.attribute);
@@ -60,16 +59,16 @@ describe('reddle.js', function(){
         console.log('INFO: ' +
                     data.attribute+' = ' + data.value +
                     ' -- at ' + data.timestamp);
-        
+
         callCounter++;
         // make sure repeated info is passed to us as subscription listener
         if (callCounter >= 3)
-        { 
+        {
           reddle.stopCollection();
           done(); // Mark test complete
         }
       });
-      
+
     });
   });
 });
