@@ -8,7 +8,7 @@ var borderColor = [
                     'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'
                 ];
 */
-
+/*
 var valuesDummy = [
                   {x:moment().add(-280, 's').format(),y:193},
                    {x:moment().add(-240, 's').format(),y:382},
@@ -23,11 +23,12 @@ var valuesDummy = [
                    {x:moment().add(-1, 's').format(),y:330},
                    //{x:moment('2016-08-10T02:10:45.000Z').format(),y:193},
                   ];
-
+*/
 
 var optionsLine =  {
   responsive: true,
   maintainAspectRatio: false,
+  animation: false,
   scales: {
     xAxes: [{
       type: "time",
@@ -71,21 +72,21 @@ var dataTemplate = {
     borderJoinStyle: 'miter',
     pointBorderColor: "rgba(75,192,192,1)",//"rgba(180,63,63,1)"
     pointBackgroundColor: "#fff",
-    pointBorderWidth: 4,
-    pointHoverRadius: 5,
+    pointBorderWidth: 1,
+    pointHoverRadius: 3,
     pointHoverBackgroundColor: "rgba(75,192,192,1)",
     pointHoverBorderColor: "rgba(220,220,220,1)",
-    pointHoverBorderWidth: 2,
+    pointHoverBorderWidth: 3,
     pointRadius: 1,
     pointHitRadius: 10,
     spanGaps: false,
   }]
 };
 
-var reddleChart = function (_dataName, _valueLabel, _ctx, _width, _height, responsive, minutesWindow) {
+var reddleChart = function (_dataName, _valueLabel, _ctx, responsive, minutesWindow) {
   this.ctx = _ctx;
-  this.width = _width;
-  this.height = _height;
+  this.width = this.ctx.width;
+  this.height = this.ctx.height;
   
   this.chartData = (JSON.parse(JSON.stringify(dataTemplate)));
   this.chartOptions = (JSON.parse(JSON.stringify(optionsLine)));
@@ -97,12 +98,16 @@ var reddleChart = function (_dataName, _valueLabel, _ctx, _width, _height, respo
     this.chartOptions.responsive = responsive;
     this.chartOptions.maintainAspectRatio = !responsive;
   }
-  this.minutesWindow = (minutesWindow != undefined) ? (-1 * minutesWindow) : -5;
+  this.minutesWindow = (minutesWindow != undefined) ? (-1 * Math.abs(minutesWindow)) : -5;
 };
 
-reddleChart.prototype.load = function() {
-  this.chartValues = [];
+reddleChart.prototype.load = function(_chartValues) {
+  this.chartValues = (_chartValues != undefined) ? _chartValues : [];
   this.loadData(this.chartValues);
+};
+
+reddleChart.prototype.clear = function() {
+  this.loadData([]);
 };
 
 reddleChart.prototype.update = function(_val, _time) {
@@ -114,13 +119,15 @@ reddleChart.prototype.update = function(_val, _time) {
   this.loadData(this.chartValues);
 };
 
+/* Only concerned about the chart object */
 reddleChart.prototype.loadData = function(values) {
   // If fixed size canvas is needed, resize it everytime to prevent distortion from ChartJS (http://stackoverflow.com/questions/19847582/chart-js-canvas-resize)
   this.ctx.width = this.width;
   this.ctx.height = this.height;
 
-  this.chartOptions.scales.xAxes[0].time.min = moment().add(this.minutesWindow, 'm').format();
-  this.chartOptions.scales.xAxes[0].time.max = moment().add(1, 'm').format();
+  var startMoment = (moment().startOf('minute')).add(this.minutesWindow, 'm');
+  this.chartOptions.scales.xAxes[0].time.min = startMoment.format();
+  this.chartOptions.scales.xAxes[0].time.max = startMoment.add(Math.abs(this.minutesWindow)+2, 'm').format();
   
   if (values != undefined) {
     this.chartData.datasets[0].data = values;

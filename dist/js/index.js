@@ -1,5 +1,7 @@
 var socket;
 var reddleHelperObj;
+var reddleChartObj;
+var refreshChartInterval;
 
 function prepareUIElements() {
   $('#btnAction').click(onBtnActionClicked);
@@ -7,16 +9,40 @@ function prepareUIElements() {
   $('#btnClearClients').click(onBtnClearClientsClicked);
 }
 
+function loadNewChart(attribute) {
+  clearChart();
+  reddleChartObj = null;
+  reddleChartObj = new reddleChart(attribute , 'values', $('#dvChartArea'), false, 5); 
+  reddleChartObj.load();
+}
+
+function clearChart() {
+  if (reddleChartObj != undefined) {
+    reddleChartObj.clear();
+  }
+}
+
+function updateChart(val, time) {
+  if (reddleChartObj != undefined) {
+    reddleChartObj.update(val, moment(time));
+  }
+}
+
+function updatePage(data){
+  $('#dvContent').html(data.attribute+' = '+data.value+' ('+data.timestamp+')');
+  updateChart(data.value, data.timestamp);
+}
+
 function onBtnActionClicked() {
   var redisAttr = $('#txtAttribute').val();
-  reddleHelperObj.subscribeAttribute(redisAttr, function (data){
-	  $('#dvContent').html(data.attribute+' = '+data.value+' ('+data.timestamp+')');
-  });
+  loadNewChart(redisAttr);
+  reddleHelperObj.subscribeAttribute(redisAttr, updatePage);
 }
 
 function onBtnRemoveClicked() {
   var redisAttr = $('#txtAttribute').val();
   reddleHelperObj.unsubscribeAttribute(redisAttr);
+  clearChart();
 }
 
 function onBtnClearClientsClicked() {

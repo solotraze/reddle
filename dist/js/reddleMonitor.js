@@ -1,6 +1,6 @@
-var QuoteControlBox = React.createClass({
+var ReddleBox = React.createClass({
   getInitialState: function() {
-    return { stockCode: '', refreshTime: ''};
+    return { values: [] };
   },
   onStockCodeChange: function(e) {
     this.setState ({ stockCode: e.target.value });

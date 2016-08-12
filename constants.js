@@ -1,6 +1,6 @@
 /*** Constants ***/
 var constantsList = {
-  'REDIS_HOST': '192.168.1.4',//'127.0.0.1',
+  'REDIS_HOST': '192.168.187.154',//'127.0.0.1',/
   'REDIS_PORT': '6379',
   'REDDLE_DEFAULT_REFRESH_TIME': 1000,
   'DATA_PATH': process.env.OPENSHIFT_DATA_DIR || './data/',
