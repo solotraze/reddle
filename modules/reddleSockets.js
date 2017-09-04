@@ -27,7 +27,7 @@ function bindSocket(io) {
   this.io = io;
 
   /* Connect and start reddle */
-  reddle.connect({host:constants.REDIS_HOST, port:constants.REDIS_PORT});
+  reddle.connect({host:constants.REDIS_HOST, port:constants.REDIS_PORT, password: constants.REDIS_PASSWORD});
   reddle.setRefreshTime(constants.REDDLE_DEFAULT_REFRESH_TIME);
   reddle.startCollection();
 

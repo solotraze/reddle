@@ -2,7 +2,13 @@ var redis = require('redis');
 var redisClient;
 
 function connect(connectionDetails) {
-  redisClient = redis.createClient({host:connectionDetails.host, port:connectionDetails.port});
+  var options = {host:connectionDetails.host, port:connectionDetails.port};
+  if (connectionDetails.password) {
+    options.password = connectionDetails.password;
+  }
+
+  redisClient = redis.createClient(options);
+  
   redisClient.on('error', function(err) {
     console.log('Error: ' + err);
   });
